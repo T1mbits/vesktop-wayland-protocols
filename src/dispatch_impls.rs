@@ -1,4 +1,5 @@
-use crate::IdleState;
+use crate::IdleNotifierState;
+use napi::threadsafe_function::ThreadsafeFunctionCallMode;
 use wayland_client::{
     globals::GlobalListContents,
     protocol::{wl_registry::WlRegistry, wl_seat::WlSeat},
@@ -9,7 +10,7 @@ use wayland_protocols::ext::idle_notify::v1::client::{
     ext_idle_notifier_v1::ExtIdleNotifierV1,
 };
 
-impl Dispatch<WlRegistry, GlobalListContents> for IdleState {
+impl Dispatch<WlRegistry, GlobalListContents> for IdleNotifierState {
     fn event(
         _state: &mut Self,
         _proxy: &WlRegistry,
@@ -18,11 +19,10 @@ impl Dispatch<WlRegistry, GlobalListContents> for IdleState {
         _conn: &Connection,
         _qhandle: &QueueHandle<Self>,
     ) {
-        let _ = _proxy;
     }
 }
 
-impl Dispatch<WlSeat, ()> for IdleState {
+impl Dispatch<WlSeat, ()> for IdleNotifierState {
     fn event(
         _state: &mut Self,
         _proxy: &WlSeat,
@@ -34,7 +34,7 @@ impl Dispatch<WlSeat, ()> for IdleState {
     }
 }
 
-impl Dispatch<ExtIdleNotifierV1, ()> for IdleState {
+impl Dispatch<ExtIdleNotifierV1, ()> for IdleNotifierState {
     fn event(
         _state: &mut Self,
         _proxy: &ExtIdleNotifierV1,
@@ -46,7 +46,7 @@ impl Dispatch<ExtIdleNotifierV1, ()> for IdleState {
     }
 }
 
-impl Dispatch<ExtIdleNotificationV1, ()> for IdleState {
+impl Dispatch<ExtIdleNotificationV1, ()> for IdleNotifierState {
     fn event(
         state: &mut Self,
         _proxy: &ExtIdleNotificationV1,
@@ -55,10 +55,16 @@ impl Dispatch<ExtIdleNotificationV1, ()> for IdleState {
         _conn: &Connection,
         _qhandle: &QueueHandle<Self>,
     ) {
-        *state.0.lock().expect("this should never be poisoned") = match event {
-            Event::Idled => true,
-            Event::Resumed => false,
-            _ => unimplemented!("notification events only have idled and resumed events as of v1"),
+        let (is_idle, callback) = match event {
+            Event::Idled => (true, state.on_idled.lock().unwrap()),
+            Event::Resumed => (false, state.on_resumed.lock().unwrap()),
+            _ => unreachable!("notification events only have idled and resumed events as of v1"),
+        };
+
+        *state.is_idle.lock().unwrap() = is_idle;
+
+        if let Some(callback) = callback.as_ref() {
+            callback.call((), ThreadsafeFunctionCallMode::Blocking);
         }
     }
 }
