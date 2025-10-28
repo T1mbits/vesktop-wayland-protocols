@@ -1,5 +1,6 @@
 {
   "name": "vesktop-wayland-protocols",
+  "author": "Timbits",
   "version": "0.1.0",
   "main": "index.js",
   "napi": {
@@ -22,5 +23,9 @@
   },
   "devDependencies": {
     "@napi-rs/cli": "^3.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/T1mbits/vesktop-wayland-protocols.git"
   }
 }
