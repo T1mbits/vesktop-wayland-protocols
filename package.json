@@ -1,0 +1,26 @@
+{
+  "name": "vesktop-wayland-protocols",
+  "version": "0.1.0",
+  "main": "index.js",
+  "napi": {
+    "binaryName": "vesktop-wayland-protocols",
+    "targets": [
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu"
+    ]
+  },
+  "files": [
+	  "index.js",
+	  "index.d.ts",
+	  "prebuilds/**"
+  ],
+  "engines": {
+    "node": ">= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0"
+  },
+  "scripts": {
+    "build": "napi build --platform --release"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.2.0"
+  }
+}
