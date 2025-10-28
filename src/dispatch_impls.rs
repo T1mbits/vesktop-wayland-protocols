@@ -1,3 +1,5 @@
+use std::sync::atomic::Ordering;
+
 use crate::IdleNotifierState;
 use napi::threadsafe_function::ThreadsafeFunctionCallMode;
 use wayland_client::{
@@ -56,14 +58,14 @@ impl Dispatch<ExtIdleNotificationV1, ()> for IdleNotifierState {
         _qhandle: &QueueHandle<Self>,
     ) {
         let (is_idle, callback) = match event {
-            Event::Idled => (true, state.on_idled.lock().unwrap()),
-            Event::Resumed => (false, state.on_resumed.lock().unwrap()),
+            Event::Idled => (true, state.on_idled.as_ref()),
+            Event::Resumed => (false, state.on_resumed.as_ref()),
             _ => unreachable!("notification events only have idled and resumed events as of v1"),
         };
 
-        *state.is_idle.lock().unwrap() = is_idle;
+        state.is_idle.store(is_idle, Ordering::SeqCst);
 
-        if let Some(callback) = callback.as_ref() {
+        if let Some(callback) = callback {
             callback.call((), ThreadsafeFunctionCallMode::Blocking);
         }
     }

@@ -572,5 +572,4 @@ if (!nativeBinding) {
 }
 
 module.exports = nativeBinding
-module.exports.WaylandIdleNotifier = nativeBinding.WaylandIdleNotifier
-module.exports.IdleNotification = nativeBinding.IdleNotification
+module.exports.IdleNotifier = nativeBinding.IdleNotifier
