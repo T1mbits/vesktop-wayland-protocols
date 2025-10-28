@@ -1,8 +1,10 @@
-const { WaylandIdleNotifier, IdleNotification } = require(".");
+const { IdleNotifier } = require(".");
 
-const idle_notifier = new WaylandIdleNotifier(1000);
-idle_notifier.on(IdleNotification.Idled, () => console.log("event: idled"));
-idle_notifier.on(IdleNotification.Resumed, () => console.log("event: resumed"));
+const idle_notifier = new IdleNotifier({
+    timeoutMs: 1000,
+    onIdled: () => console.log("event: idled"),
+    onResumed: () => console.log("event: resumed")
+});
 
 function tick() {
     console.log("tick: ", idle_notifier.isIdle());
