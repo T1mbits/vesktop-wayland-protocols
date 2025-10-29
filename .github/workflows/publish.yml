@@ -4,6 +4,9 @@ on:
       - "*"
   workflow_dispatch:
 
+permissions:
+  id-token: write
+
 jobs:
   build:
     name: Build - ${{ matrix.arch }}
@@ -65,5 +68,3 @@ jobs:
           path: prebuilds
       - name: Publish to npm
         run: npm publish --verbose
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
