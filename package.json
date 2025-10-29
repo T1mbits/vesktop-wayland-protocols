@@ -1,7 +1,7 @@
 {
   "name": "vesktop-wayland-protocols",
   "author": "Timbits",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "index.js",
   "napi": {
     "binaryName": "vesktop-wayland-protocols",
