@@ -10,7 +10,11 @@ use std::{
     },
     thread,
 };
-use wayland_client::{globals::registry_queue_init, protocol::wl_seat::WlSeat, Connection, Proxy};
+use wayland_client::{
+    globals::{registry_queue_init, Global},
+    protocol::wl_seat::WlSeat,
+    Connection, Proxy,
+};
 use wayland_protocols::ext::idle_notify::v1::client::ext_idle_notifier_v1::ExtIdleNotifierV1;
 
 pub type UnitInfalliableCallback = ThreadsafeFunction<(), (), (), Status, false>;
@@ -52,10 +56,20 @@ impl IdleNotifier {
 
         let connection = Connection::connect_to_env()?;
         let (globals, mut event_queue) = registry_queue_init(&connection)?;
+        let globals_list = globals.contents().clone_list();
+
+        if globals_list
+            .iter()
+            .all(|g| g.interface != ExtIdleNotifierV1::interface().name)
+        {
+            return Err(anyhow!(
+                "ext_idle_notifier_v1 is not supported by the compositor",
+            ));
+        }
+
         let queue_handle = event_queue.handle();
 
-        let seats = globals.contents().clone_list();
-        let interface_ver = seats
+        let interface_ver = globals_list
             .iter()
             .find(|g| g.interface == WlSeat::interface().name)
             .ok_or_else(|| anyhow!("no wl_seat found in global list"))?
