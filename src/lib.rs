@@ -11,7 +11,7 @@ use std::{
     thread,
 };
 use wayland_client::{
-    globals::{registry_queue_init, Global},
+    globals::{registry_queue_init},
     protocol::wl_seat::WlSeat,
     Connection, Proxy,
 };
