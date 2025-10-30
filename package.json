@@ -2,6 +2,8 @@
   "name": "vesktop-wayland-protocols",
   "author": "Timbits",
   "version": "0.1.2",
+  "os": ["linux"],
+  "cpu": ["x64", "arm64"],
   "main": "index.js",
   "napi": {
     "binaryName": "vesktop-wayland-protocols",
