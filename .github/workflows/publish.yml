@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  contents: write
   id-token: write
 
 jobs:
@@ -61,6 +62,10 @@ jobs:
         with:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
+          always-auth: true
+
+      - name: update npm
+        run: npm install -g npm@latest
 
       - name: download artifacts
         uses: actions/download-artifact@v5
